@@ -19,11 +19,6 @@ export default function Nav() {
             </Link>
           </li>
           <li>
-            <Link href="/digest" className={pathname === '/digest' ? 'active' : ''}>
-              Digest
-            </Link>
-          </li>
-          <li>
             <Link href="/admin" className={pathname.startsWith('/admin') ? 'active' : ''}>
               Admin
             </Link>
