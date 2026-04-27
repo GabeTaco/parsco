@@ -51,6 +51,39 @@ export const tokens = pgTable('tokens', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
+export const bidStatusEnum = pgEnum('bid_status', ['draft', 'submitted', 'reviewed', 'awarded', 'rejected'])
+
+export const bids = pgTable('bids', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  jobId: uuid('job_id').notNull().references(() => jobs.id),
+  subcontractorName: text('subcontractor_name').notNull(),
+  subcontractorEmail: text('subcontractor_email'),
+  trade: text('trade').notNull(),
+  bidDate: date('bid_date').notNull(),
+  validUntil: date('valid_until'),
+  totalAmount: numeric('total_amount').notNull(),
+  status: bidStatusEnum('status').notNull().default('submitted'),
+  inclusions: text('inclusions'),
+  exclusions: text('exclusions'),
+  qualifications: text('qualifications'),
+  rawSubmissionData: jsonb('raw_submission_data'),
+  reviewNotes: text('review_notes'),
+  submittedAt: timestamp('submitted_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+export const bidLineItems = pgTable('bid_line_items', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  bidId: uuid('bid_id').notNull().references(() => bids.id, { onDelete: 'cascade' }),
+  sortOrder: integer('sort_order').notNull(),
+  description: text('description').notNull(),
+  quantity: numeric('quantity'),
+  unit: text('unit'),
+  unitPrice: numeric('unit_price'),
+  totalPrice: numeric('total_price').notNull(),
+  notes: text('notes'),
+})
+
 export const pendingDecisions = pgTable('pending_decisions', {
   id: uuid('id').primaryKey().defaultRandom(),
   jobId: uuid('job_id').references(() => jobs.id),
