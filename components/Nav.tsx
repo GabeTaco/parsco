@@ -23,6 +23,11 @@ export default function Nav() {
               Admin
             </Link>
           </li>
+          <li>
+            <Link href="/cmd" className={pathname.startsWith('/cmd') ? 'active' : ''}>
+              CMD
+            </Link>
+          </li>
         </ul>
         <div className="nav-right">
           <span className="tiny">Project Executive</span>
