@@ -3,7 +3,6 @@ import { tokens, jobs } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import Nav from '@/components/Nav'
 import TokenForm from './TokenForm'
-import { requireAuth } from '@/lib/require-auth'
 
 function formatDate(d: Date) {
   return new Date(d).toLocaleDateString('en-US', {
@@ -14,7 +13,6 @@ function formatDate(d: Date) {
 }
 
 export default async function AdminTokensPage() {
-  await requireAuth()
   const allJobs = await db.select().from(jobs).orderBy(jobs.name)
 
   const tokenRows = await db

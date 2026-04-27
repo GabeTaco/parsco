@@ -2,7 +2,6 @@ import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import Link from 'next/link'
 import Nav from '@/components/Nav'
-import { requireAuth } from '@/lib/require-auth'
 
 function formatCurrency(value: string | number) {
   const num = typeof value === 'string' ? parseFloat(value) : value
@@ -17,7 +16,6 @@ const statusConfig: Record<string, { label: string; badgeClass: string }> = {
 }
 
 export default async function JobsPage() {
-  await requireAuth()
   const allJobs = await db.select().from(jobs).orderBy(jobs.createdAt)
 
   return (

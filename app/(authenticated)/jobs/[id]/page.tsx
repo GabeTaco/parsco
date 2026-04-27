@@ -3,7 +3,6 @@ import { jobs, issues, siteReports } from '@/lib/db/schema'
 import { eq, and, desc } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import Nav from '@/components/Nav'
-import { requireAuth } from '@/lib/require-auth'
 
 function formatCurrency(value: string | number) {
   const num = typeof value === 'string' ? parseFloat(value) : value
@@ -36,7 +35,6 @@ const flagDotClass: Record<string, string> = {
 const flagOrder: Record<string, number> = { red: 0, yellow: 1, green: 2 }
 
 export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireAuth()
   const { id } = await params
 
   const jobRows = await db.select().from(jobs).where(eq(jobs.id, id)).limit(1)
