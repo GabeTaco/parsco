@@ -22,7 +22,10 @@ export default async function JobsPage() {
     <>
       <Nav />
       <main className="page page-jobs">
-        <h1 className="page-title">Active Jobs</h1>
+        <div className="row-between" style={{ marginBottom: '24px' }}>
+          <h1 className="page-title" style={{ margin: 0 }}>Jobs</h1>
+          <Link href="/jobs/new" className="btn btn-primary">+ New Job</Link>
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {allJobs.map((job) => {
             const status = statusConfig[job.status] ?? statusConfig.active
