@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getIronSession } from 'iron-session'
-import { sessionOptions, SessionData } from './lib/auth'
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
   const { pathname } = req.nextUrl
 
   if (
@@ -12,15 +9,15 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon')
   ) {
-    return res
+    return NextResponse.next()
   }
 
-  const session = await getIronSession<SessionData>(req, res, sessionOptions)
-  if (!session.authenticated) {
+  const session = req.cookies.get('parsco_session')
+  if (!session?.value) {
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
-  return res
+  return NextResponse.next()
 }
 
 export const config = {
