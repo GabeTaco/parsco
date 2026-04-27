@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 export async function POST(req: NextRequest) {
   try {
-    const { jobId, expiresAt } = await req.json()
+    const { jobId, expiresAt, purpose } = await req.json()
 
     if (!jobId || !expiresAt) {
       return NextResponse.json({ error: 'Missing jobId or expiresAt' }, { status: 400 })
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       .values({
         jobId,
         tokenValue,
-        purpose: 'site_report',
+        purpose: purpose ?? 'site_report',
         expiresAt: new Date(expiresAt),
       })
       .returning()
