@@ -31,7 +31,7 @@ export default function DigestGenerator() {
         <p className="muted" style={{ fontSize: '0.9rem', marginBottom: '16px' }}>
           AI briefing is generated on demand.
         </p>
-        <button className="btn-primary" style={{ width: 'auto', padding: '10px 28px' }} onClick={generate}>
+        <button className="btn btn-primary" style={{ padding: '10px 28px' }} onClick={generate}>
           Generate Digest
         </button>
       </div>
@@ -49,10 +49,10 @@ export default function DigestGenerator() {
   if (state === 'error') {
     return (
       <div className="card" style={{ padding: '24px', textAlign: 'center' }}>
-        <p style={{ fontSize: '0.9rem', color: 'var(--accent)', marginBottom: '12px' }}>
+        <p style={{ fontSize: '0.9rem', color: 'var(--flag-red)', marginBottom: '12px' }}>
           Generation failed. Check that ANTHROPIC_API_KEY is set in Vercel.
         </p>
-        <button className="btn-secondary" onClick={generate}>Try again</button>
+        <button className="btn" onClick={generate}>Try again</button>
       </div>
     )
   }
@@ -62,9 +62,9 @@ export default function DigestGenerator() {
       <div className="card" style={{ padding: '24px', fontSize: '0.9rem', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
         {digest}
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
-        <span className="muted" style={{ fontSize: '0.75rem' }}>Generated {generatedAt}</span>
-        <button className="btn-secondary" style={{ fontSize: '0.8rem', padding: '6px 12px' }} onClick={generate}>
+      <div className="row-between" style={{ marginTop: '10px' }}>
+        <span className="tiny">Generated {generatedAt}</span>
+        <button className="btn" style={{ fontSize: '0.8rem', padding: '6px 12px' }} onClick={generate}>
           Regenerate
         </button>
       </div>

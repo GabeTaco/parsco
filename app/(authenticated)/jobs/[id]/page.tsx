@@ -6,11 +6,7 @@ import Nav from '@/components/Nav'
 
 function formatCurrency(value: string | number) {
   const num = typeof value === 'string' ? parseFloat(value) : value
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(num)
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num)
 }
 
 function formatDate(dateStr: string) {
@@ -20,16 +16,16 @@ function formatDate(dateStr: string) {
 }
 
 const statusConfig: Record<string, { label: string; badgeClass: string }> = {
-  active: { label: 'Active', badgeClass: 'badge badge--active' },
-  punch_list: { label: 'Punch List', badgeClass: 'badge badge--punch-list' },
-  bidding: { label: 'Bidding', badgeClass: 'badge badge--bidding' },
-  complete: { label: 'Complete', badgeClass: 'badge badge--complete' },
+  active:     { label: 'Active',     badgeClass: 'badge badge--active' },
+  punch_list: { label: 'Punch List', badgeClass: 'badge badge--punch' },
+  bidding:    { label: 'Bidding',    badgeClass: 'badge badge--bidding' },
+  complete:   { label: 'Complete',   badgeClass: 'badge badge--complete' },
 }
 
-const flagDotClass: Record<string, string> = {
-  red: 'flag-dot flag-dot--red',
-  yellow: 'flag-dot flag-dot--yellow',
-  green: 'flag-dot flag-dot--green',
+const flagClass: Record<string, string> = {
+  red:    'flag flag--red',
+  yellow: 'flag flag--yellow',
+  green:  'flag flag--green',
 }
 
 const flagOrder: Record<string, number> = { red: 0, yellow: 1, green: 2 }
@@ -65,77 +61,56 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   return (
     <>
       <Nav />
-      <main className="page-shell--narrow">
+      <main className="page page-detail">
         {/* Header */}
         <div className="section">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
-            <h1
-              className="serif page-title"
-              style={{ margin: 0 }}
-            >
-              {job.name}
-            </h1>
-            <span className={status.badgeClass}>
-              {status.label}
-            </span>
+          <div className="row" style={{ marginBottom: '6px', flexWrap: 'wrap', gap: '10px' }}>
+            <h1 className="page-title" style={{ margin: 0 }}>{job.name}</h1>
+            <span className={status.badgeClass}>{status.label}</span>
           </div>
-          <p className="muted" style={{ fontSize: '0.9rem', margin: '4px 0' }}>{job.clientName}</p>
-          <p className="muted" style={{ fontSize: '0.85rem', margin: '2px 0' }}>{job.siteAddress}</p>
+          <div className="meta" style={{ marginTop: '4px' }}>{job.clientName}</div>
+          <div className="meta" style={{ marginTop: '2px' }}>{job.siteAddress}</div>
         </div>
 
-        {/* Schedule + Budget grid */}
+        {/* Schedule + Budget */}
         <div className="two-col section">
-          {/* Schedule */}
-          <div className="card" style={{ padding: '20px' }}>
-            <h3 className="section-label" style={{ margin: '0 0 16px' }}>Schedule</h3>
-            <div className="body-sm" style={{ marginBottom: '4px' }}>
+          <div className="card">
+            <div className="section-label" style={{ marginBottom: '16px' }}>Schedule</div>
+            <div style={{ fontSize: '0.85rem', marginBottom: '4px' }}>
               {formatDate(job.startDate)} → {formatDate(job.targetCompletionDate)}
             </div>
             {job.daysVariance !== 0 && (
-              <div
-                className={job.daysVariance > 0 ? 'variance--ahead' : 'variance--behind'}
-                style={{ fontSize: '0.82rem', marginBottom: '12px' }}
-              >
+              <div className={job.daysVariance > 0 ? 'variance--ahead' : 'variance--behind'} style={{ fontSize: '0.82rem', marginBottom: '12px' }}>
                 {job.daysVariance > 0
                   ? `+${job.daysVariance} days ahead of schedule`
                   : `${Math.abs(job.daysVariance)} days behind schedule`}
               </div>
             )}
             <div style={{ marginTop: '12px' }}>
-              <div className="row muted" style={{ fontSize: '0.8rem', marginBottom: '6px' }}>
+              <div className="row-between meta" style={{ fontSize: '0.8rem', marginBottom: '6px' }}>
                 <span>Progress</span>
                 <span>{job.percentComplete}%</span>
               </div>
-              <div className="progress-track">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${job.percentComplete}%` }}
-                />
+              <div className="progress" role="progressbar" aria-valuenow={job.percentComplete} aria-valuemin={0} aria-valuemax={100}>
+                <i style={{ width: `${job.percentComplete}%` }} />
               </div>
             </div>
           </div>
 
-          {/* Budget */}
-          <div className="card" style={{ padding: '20px' }}>
-            <h3 className="section-label" style={{ margin: '0 0 16px' }}>Budget</h3>
+          <div className="card">
+            <div className="section-label" style={{ marginBottom: '16px' }}>Budget</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem' }}>
-              <div className="row">
+              <div className="row-between">
                 <span className="muted">Contract</span>
                 <span>{formatCurrency(contractNum)}</span>
               </div>
-              <div className="row">
+              <div className="row-between">
                 <span className="muted">Current Spend</span>
                 <span>{formatCurrency(spendNum)}</span>
               </div>
-              <div
-                className="row"
-                style={{ paddingTop: '8px', borderTop: '1px solid var(--border)' }}
-              >
+              <div className="row-between" style={{ paddingTop: '8px', borderTop: '1px solid var(--border)' }}>
                 <span className="muted">Remaining</span>
-                <span
-                  className={isOverBudget ? 'variance--behind' : 'variance--ahead'}
-                  style={{ fontWeight: '600' }}
-                >
+                <span className={isOverBudget ? 'variance--behind' : 'variance--ahead'} style={{ fontWeight: '600' }}>
                   {isOverBudget ? '-' : ''}{formatCurrency(Math.abs(variance))}
                 </span>
               </div>
@@ -146,23 +121,21 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         {/* Open Issues */}
         {sortedIssues.length > 0 && (
           <div className="section">
-            <h2 className="section-label">Open Issues</h2>
+            <div className="section-label">Open Issues</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {sortedIssues.map((issue) => (
                 <div
                   key={issue.id}
-                  className="card--sm"
-                  style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}
+                  className="card"
+                  style={{ padding: '14px 18px', display: 'flex', alignItems: 'flex-start', gap: '12px' }}
                 >
-                  <div
-                    className={flagDotClass[issue.flagColor] ?? 'flag-dot'}
-                    style={!flagDotClass[issue.flagColor] ? { background: '#ccc' } : undefined}
+                  <span
+                    className={flagClass[issue.flagColor] ?? 'flag'}
+                    aria-label={issue.flagColor}
                   />
                   <div>
-                    <div style={{ fontSize: '0.9rem', fontWeight: '500', marginBottom: '4px' }}>
-                      {issue.title}
-                    </div>
-                    <div className="body-xs">{issue.description}</div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: '500', marginBottom: '4px' }}>{issue.title}</div>
+                    <div className="tiny">{issue.description}</div>
                   </div>
                 </div>
               ))}
@@ -173,28 +146,23 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         {/* Recent Activity */}
         {reports.length > 0 && (
           <div className="section">
-            <h2 className="section-label">Recent Activity</h2>
+            <div className="section-label">Recent Activity</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {reports.map((report) => (
                 <div key={report.id} className="card">
-                  <div className="row" style={{ marginBottom: '12px' }}>
-                    <span style={{ fontWeight: '500', fontSize: '0.9rem' }}>
-                      {report.superName}
-                    </span>
-                    <span className="body-xs">{formatDate(report.reportDate)}</span>
+                  <div className="row-between" style={{ marginBottom: '12px' }}>
+                    <span style={{ fontWeight: '500', fontSize: '0.9rem' }}>{report.superName}</span>
+                    <span className="tiny">{formatDate(report.reportDate)}</span>
                   </div>
                   {report.digestText ? (
-                    <p style={{ fontSize: '0.9rem', lineHeight: '1.6', margin: 0 }}>
-                      {report.digestText}
-                    </p>
+                    <p style={{ fontSize: '0.9rem', lineHeight: '1.6', margin: 0 }}>{report.digestText}</p>
                   ) : (
-                    <p className="muted" style={{ fontSize: '0.9rem', lineHeight: '1.6', margin: 0 }}>
-                      {report.workCompleted}
-                    </p>
+                    <p className="muted" style={{ fontSize: '0.9rem', lineHeight: '1.6', margin: 0 }}>{report.workCompleted}</p>
                   )}
                   {report.blockers && (
-                    <div className="blocker-callout">
-                      <strong>Blocker:</strong> {report.blockers}
+                    <div className="blocker">
+                      <div className="blocker-label">Blocker</div>
+                      {report.blockers}
                     </div>
                   )}
                 </div>
@@ -204,11 +172,9 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         )}
 
         {/* Documents */}
-        <div>
-          <h2 className="section-label">Documents</h2>
-          <div className="card muted" style={{ fontSize: '0.85rem' }}>
-            Document vault coming soon.
-          </div>
+        <div className="section">
+          <div className="section-label">Documents</div>
+          <div className="card muted" style={{ fontSize: '0.85rem' }}>Document vault coming soon.</div>
         </div>
       </main>
     </>

@@ -58,47 +58,43 @@ export default async function DigestPage() {
   return (
     <>
       <Nav />
-      <main className="page-shell--digest">
-        <p className="section-label" style={{ marginBottom: '8px' }}>Executive Briefing</p>
-        <h1 className="serif" style={{ fontSize: '1.8rem', fontWeight: 'normal', marginBottom: '32px' }}>
-          {formatWeek(mon, sun)}
-        </h1>
+      <main className="page page-digest">
+        <div className="section-label">Executive Briefing</div>
+        <h1 className="digest-title">{formatWeek(mon, sun)}</h1>
 
-        {/* Stat blocks */}
-        <div className="stat-grid" style={{ marginBottom: '40px' }}>
-          {[
-            { label: 'Active Jobs', value: activeJobs.length },
-            { label: 'Red Issues', value: openRedIssues.length },
-            { label: 'Pending Decisions', value: pendingDecs.length },
-          ].map((stat) => (
-            <div key={stat.label} className="stat-block">
-              <div className="serif stat-number">{stat.value}</div>
-              <div className="stat-label">{stat.label}</div>
-            </div>
-          ))}
+        {/* Stats */}
+        <div className="card section" style={{ marginTop: '24px' }}>
+          <div className="stats">
+            {[
+              { label: 'Active Jobs',       value: activeJobs.length },
+              { label: 'Red Issues',        value: openRedIssues.length },
+              { label: 'Pending Decisions', value: pendingDecs.length },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <div className="stat-num">{stat.value}</div>
+                <div className="stat-lbl">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* What changed this week — on-demand */}
-        <section style={{ marginBottom: '40px' }}>
-          <h2 className="serif" style={{ fontSize: '1.1rem', fontWeight: 'normal', marginBottom: '16px' }}>
-            What changed this week
-          </h2>
+        {/* What changed this week */}
+        <section className="section">
+          <h2 className="section-heading">What changed this week</h2>
           <DigestGenerator />
         </section>
 
         {/* Flagged for attention */}
         {openRedIssues.length > 0 && (
-          <section style={{ marginBottom: '40px' }}>
-            <h2 className="serif" style={{ fontSize: '1.1rem', fontWeight: 'normal', marginBottom: '16px' }}>
-              Flagged for attention
-            </h2>
+          <section className="section">
+            <h2 className="section-heading">Flagged for attention</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {openRedIssues.map((issue) => (
-                <div key={issue.id} className="card--flush" style={{ borderColor: '#f5d0d0', padding: '16px 20px', display: 'flex', gap: '12px' }}>
-                  <div className="flag-dot flag-dot--red" style={{ marginTop: '4px' }} />
+                <div key={issue.id} className="card card-strong" style={{ borderLeftColor: 'var(--flag-red)', display: 'flex', gap: '12px', padding: '16px 20px' }}>
+                  <span className="flag flag--red" aria-label="critical" style={{ marginTop: '4px' }} />
                   <div>
                     <div style={{ fontWeight: '500', fontSize: '0.9rem' }}>{issue.title}</div>
-                    <div className="muted" style={{ fontSize: '0.82rem', marginTop: '4px' }}>{jobMap[issue.jobId] ?? 'Unknown job'}</div>
+                    <div className="tiny" style={{ marginTop: '4px' }}>{jobMap[issue.jobId] ?? 'Unknown job'}</div>
                     <div style={{ fontSize: '0.85rem', marginTop: '6px', lineHeight: '1.5' }}>{issue.description}</div>
                   </div>
                 </div>
@@ -109,15 +105,13 @@ export default async function DigestPage() {
 
         {/* Pending decisions */}
         {pendingDecs.length > 0 && (
-          <section style={{ marginBottom: '40px' }}>
-            <h2 className="serif" style={{ fontSize: '1.1rem', fontWeight: 'normal', marginBottom: '16px' }}>
-              Pending decisions
-            </h2>
+          <section className="section">
+            <h2 className="section-heading">Pending decisions</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {pendingDecs.map((dec) => (
                 <div key={dec.id} className="card" style={{ padding: '16px 20px' }}>
                   <div style={{ fontWeight: '500', fontSize: '0.9rem', marginBottom: '6px' }}>{dec.title}</div>
-                  <div className="body-xs">{dec.context}</div>
+                  <div className="tiny">{dec.context}</div>
                 </div>
               ))}
             </div>
@@ -126,15 +120,13 @@ export default async function DigestPage() {
 
         {/* Looking ahead */}
         {upcomingJobs.length > 0 && (
-          <section style={{ marginBottom: '40px' }}>
-            <h2 className="serif" style={{ fontSize: '1.1rem', fontWeight: 'normal', marginBottom: '16px' }}>
-              Looking ahead
-            </h2>
+          <section className="section">
+            <h2 className="section-heading">Looking ahead</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {upcomingJobs.map((j) => (
-                <div key={j.id} className="card--sm" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div key={j.id} className="card row-between" style={{ padding: '14px 18px' }}>
                   <span style={{ fontSize: '0.9rem' }}>{j.name}</span>
-                  <span className="body-xs">Target: {formatDate(j.targetCompletionDate)}</span>
+                  <span className="tiny">Target: {formatDate(j.targetCompletionDate)}</span>
                 </div>
               ))}
             </div>

@@ -10,25 +10,27 @@ interface Props {
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '14px 16px',
-  border: '1px solid #d8cfc2',
-  borderRadius: '8px',
+  border: '1px solid #d8dde5',
+  borderRadius: '3px',
   backgroundColor: '#ffffff',
-  color: '#1a1512',
+  color: '#1c2638',
   fontSize: '1rem',
   boxSizing: 'border-box',
   lineHeight: '1.5',
+  fontFamily: 'Inter, system-ui, sans-serif',
   appearance: 'none',
   WebkitAppearance: 'none',
 }
 
 const labelStyle: React.CSSProperties = {
   display: 'block',
-  fontSize: '0.82rem',
-  fontWeight: '500',
-  color: '#8a7e74',
+  fontSize: '0.72rem',
+  fontWeight: '600',
+  color: '#6b7689',
   marginBottom: '8px',
   textTransform: 'uppercase',
-  letterSpacing: '0.06em',
+  letterSpacing: '0.08em',
+  fontFamily: 'Inter, system-ui, sans-serif',
 }
 
 export default function SiteReportForm({ tokenValue, jobName }: Props) {
@@ -49,13 +51,7 @@ export default function SiteReportForm({ tokenValue, jobName }: Props) {
       const res = await fetch('/api/site-report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tokenValue,
-          superName,
-          reportDate,
-          workCompleted,
-          blockers: blockers || null,
-        }),
+        body: JSON.stringify({ tokenValue, superName, reportDate, workCompleted, blockers: blockers || null }),
       })
       if (res.ok) {
         setSubmitted(true)
@@ -72,37 +68,14 @@ export default function SiteReportForm({ tokenValue, jobName }: Props) {
 
   if (submitted) {
     return (
-      <div
-        style={{
-          backgroundColor: '#ffffff',
-          border: '1px solid #d8cfc2',
-          borderRadius: '8px',
-          padding: '40px 28px',
-          textAlign: 'center',
-        }}
-      >
-        <div
-          style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: '50%',
-            backgroundColor: '#e8f5e9',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 16px',
-            fontSize: '1.2rem',
-          }}
-        >
+      <div style={{ backgroundColor: '#ffffff', border: '1px solid #d8dde5', borderRadius: '4px', padding: '40px 28px', textAlign: 'center' }}>
+        <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#e3eef5', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '1.2rem', color: '#1f5288' }}>
           &#10003;
         </div>
-        <h2
-          className="serif"
-          style={{ fontSize: '1.2rem', fontWeight: 'normal', color: '#1a1512', marginBottom: '10px' }}
-        >
+        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.3rem', fontWeight: '600', color: '#2c3e6b', marginBottom: '10px' }}>
           Report submitted
         </h2>
-        <p style={{ color: '#8a7e74', fontSize: '0.9rem', lineHeight: '1.6' }}>
+        <p style={{ color: '#6b7689', fontSize: '0.9rem', lineHeight: '1.6' }}>
           Thanks. Your report has been delivered to Amir.
         </p>
       </div>
@@ -111,72 +84,30 @@ export default function SiteReportForm({ tokenValue, jobName }: Props) {
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div
-        style={{
-          backgroundColor: '#ffffff',
-          border: '1px solid #d8cfc2',
-          borderRadius: '8px',
-          padding: '24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-        }}
-      >
+      <div style={{ backgroundColor: '#ffffff', border: '1px solid #d8dde5', borderRadius: '4px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <div>
           <label style={labelStyle}>Your Name</label>
-          <input
-            type="text"
-            value={superName}
-            onChange={(e) => setSuperName(e.target.value)}
-            required
-            placeholder="First and last name"
-            style={inputStyle}
-            autoComplete="name"
-          />
+          <input type="text" value={superName} onChange={(e) => setSuperName(e.target.value)} required placeholder="First and last name" style={inputStyle} autoComplete="name" />
         </div>
-
         <div>
           <label style={labelStyle}>Report Date</label>
-          <input
-            type="date"
-            value={reportDate}
-            onChange={(e) => setReportDate(e.target.value)}
-            required
-            style={inputStyle}
-          />
+          <input type="date" value={reportDate} onChange={(e) => setReportDate(e.target.value)} required style={inputStyle} />
         </div>
-
         <div>
           <label style={labelStyle}>What got done today</label>
-          <textarea
-            value={workCompleted}
-            onChange={(e) => setWorkCompleted(e.target.value)}
-            required
-            rows={5}
-            placeholder="Describe work completed on site today..."
-            style={{ ...inputStyle, resize: 'vertical', minHeight: '120px' }}
-          />
+          <textarea value={workCompleted} onChange={(e) => setWorkCompleted(e.target.value)} required rows={5} placeholder="Describe work completed on site today..." style={{ ...inputStyle, resize: 'vertical', minHeight: '120px' }} />
         </div>
-
         <div>
           <label style={labelStyle}>
             Blockers{' '}
-            <span style={{ fontWeight: '400', textTransform: 'none', letterSpacing: 0, color: '#8a7e74' }}>
-              (optional)
-            </span>
+            <span style={{ fontWeight: '400', textTransform: 'none', letterSpacing: 0, color: '#6b7689' }}>(optional)</span>
           </label>
-          <textarea
-            value={blockers}
-            onChange={(e) => setBlockers(e.target.value)}
-            rows={3}
-            placeholder="Any issues holding up work..."
-            style={{ ...inputStyle, resize: 'vertical', minHeight: '80px' }}
-          />
+          <textarea value={blockers} onChange={(e) => setBlockers(e.target.value)} rows={3} placeholder="Any issues holding up work..." style={{ ...inputStyle, resize: 'vertical', minHeight: '80px' }} />
         </div>
       </div>
 
       {error && (
-        <p style={{ color: '#6b1f1a', fontSize: '0.85rem', margin: 0 }}>{error}</p>
+        <p style={{ color: '#c0392b', fontSize: '0.85rem', margin: 0 }}>{error}</p>
       )}
 
       <button
@@ -184,20 +115,23 @@ export default function SiteReportForm({ tokenValue, jobName }: Props) {
         disabled={loading || !superName || !workCompleted}
         style={{
           padding: '16px',
-          backgroundColor: loading || !superName || !workCompleted ? '#d8cfc2' : '#6b1f1a',
+          backgroundColor: loading || !superName || !workCompleted ? '#d8dde5' : '#2c3e6b',
           color: '#ffffff',
           border: 'none',
-          borderRadius: '8px',
-          fontSize: '1rem',
-          fontWeight: '500',
+          borderRadius: '3px',
+          fontSize: '0.78rem',
+          fontWeight: '600',
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
           cursor: loading || !superName || !workCompleted ? 'not-allowed' : 'pointer',
           width: '100%',
+          fontFamily: 'Inter, system-ui, sans-serif',
         }}
       >
         {loading ? 'Submitting...' : 'Submit Report'}
       </button>
 
-      <p style={{ textAlign: 'center', fontSize: '0.78rem', color: '#8a7e74' }}>
+      <p style={{ textAlign: 'center', fontSize: '0.78rem', color: '#6b7689', fontFamily: 'Inter, system-ui, sans-serif' }}>
         {jobName}
       </p>
     </form>

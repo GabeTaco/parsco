@@ -35,9 +35,7 @@ export default function LoginPage() {
   return (
     <div className="login-shell">
       <div className="login-card">
-        <h1 className="serif" style={{ fontSize: '2rem', fontWeight: 'normal', marginBottom: '8px' }}>
-          Parsco
-        </h1>
+        <img src="/parsco-logo.png" alt="ParsCo" style={{ height: '36px', marginBottom: '24px' }} />
         <p className="muted" style={{ marginBottom: '32px', fontSize: '0.9rem' }}>
           Enter PIN to continue
         </p>
@@ -56,17 +54,18 @@ export default function LoginPage() {
               textAlign: 'center',
               letterSpacing: '0.5em',
               border: '1px solid var(--border)',
-              borderRadius: '6px',
-              backgroundColor: 'var(--bg)',
+              borderRadius: '3px',
+              backgroundColor: '#fff',
               color: 'var(--text)',
               outline: 'none',
               boxSizing: 'border-box',
+              fontFamily: 'var(--sans)',
             }}
             autoFocus
             autoComplete="off"
           />
           {error && (
-            <p style={{ color: 'var(--accent)', fontSize: '0.85rem', marginTop: '12px' }}>{error}</p>
+            <p style={{ color: 'var(--flag-red)', fontSize: '0.85rem', marginTop: '12px' }}>{error}</p>
           )}
           <button
             type="submit"
@@ -75,14 +74,17 @@ export default function LoginPage() {
               marginTop: '20px',
               width: '100%',
               padding: '12px',
-              backgroundColor: pin.length === 4 && !loading ? 'var(--accent)' : 'var(--border)',
+              backgroundColor: pin.length === 4 && !loading ? 'var(--navy)' : 'var(--border)',
               color: '#ffffff',
               border: 'none',
-              borderRadius: '6px',
-              fontSize: '0.9rem',
-              fontWeight: '500',
+              borderRadius: '3px',
+              fontSize: '0.78rem',
+              fontWeight: '600',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
               cursor: pin.length === 4 && !loading ? 'pointer' : 'not-allowed',
               transition: 'background-color 0.15s',
+              fontFamily: 'var(--sans)',
             }}
           >
             {loading ? 'Checking...' : 'Continue'}
