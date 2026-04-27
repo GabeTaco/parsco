@@ -43,8 +43,8 @@ SESSION_SECRET — iron-session signing key
 
 ## Design System
 CSS variables in app/globals.css. Utility classes in same file.
-Colors: --bg #fbf8f2, --text #1a1512, --muted #8a7e74, --accent #6b1f1a (oxblood), --border #d8cfc2, --card #ffffff
-Typography: Inter (UI) + Georgia (serif headers/digest)
+Colors: --bg #f4f5f7, --text #1c2638, --muted #6b7689, --navy #2c3e6b (primary), --border #d8dde5, --card #ffffff
+Typography: Inter (UI) + Cormorant Garamond (serif headers/digest) — both loaded from Google Fonts
 DO NOT use inline style props for anything covered by a CSS class.
 
 ## Context Architecture
@@ -74,3 +74,12 @@ Pending decisions: 2 pre-loaded
 Site report prompt: lib/prompts/site-report.ts
 Weekly digest prompt: lib/prompts/weekly-digest.ts
 Both prompts reference context/CANONICAL.json benchmarks where relevant.
+
+---
+
+## Session Log
+
+### 2026-04-27
+- **Built:** Full app scaffold — Next.js 16 App Router, Neon PostgreSQL, Drizzle ORM, Vercel deploy. PIN auth (cookie-based, no iron-session). Job grid + job detail views (schedule, budget, open issues, recent activity). Site report token flow: admin creates link → super submits form on mobile → AI processes submission → report appears in job detail. Weekly AI digest with on-demand Generate button. Admin "Site Report Links" page with Copy Link, QR code toggle, and Revoke per link.
+- **Changed:** Removed iron-session (Edge Runtime incompatibility). Moved auth gate to `app/(authenticated)/layout.tsx` route group pattern. Moved AI digest from page-load blocking to on-demand client component. Applied real Parsco design system: navy/cool-gray palette eyedropped from logo and pars-co.net, Cormorant Garamond + Inter fonts, real logo, address sub-bar, "AF" avatar. Renamed "tokens" → "links" throughout admin UI.
+- **Pending:** Confirm `ANTHROPIC_API_KEY` is set in Vercel (not placeholder). Full demo run-through before 2:30 PM: login → jobs → job detail → digest generate → site report submission.
