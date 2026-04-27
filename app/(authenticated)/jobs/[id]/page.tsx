@@ -1,7 +1,8 @@
 import { db } from '@/lib/db'
-import { jobs, issues, siteReports } from '@/lib/db/schema'
+import { jobs, issues, siteReports, bids } from '@/lib/db/schema'
 import { eq, and, desc } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import Nav from '@/components/Nav'
 
 function formatCurrency(value: string | number) {
@@ -52,6 +53,11 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     .where(eq(siteReports.jobId, id))
     .orderBy(desc(siteReports.reportDate))
 
+  const bidCount = await db
+    .select({ id: bids.id })
+    .from(bids)
+    .where(eq(bids.jobId, id))
+
   const status = statusConfig[job.status] ?? statusConfig.active
   const contractNum = parseFloat(String(job.contractValue))
   const spendNum = parseFloat(String(job.currentSpend))
@@ -70,6 +76,11 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
           </div>
           <div className="meta" style={{ marginTop: '4px' }}>{job.clientName}</div>
           <div className="meta" style={{ marginTop: '2px' }}>{job.siteAddress}</div>
+          <div style={{ marginTop: '12px' }}>
+            <Link href={`/jobs/${id}/bids`} className="btn" style={{ fontSize: '0.75rem', padding: '5px 12px' }}>
+              Bids {bidCount.length > 0 ? `(${bidCount.length})` : ''}
+            </Link>
+          </div>
         </div>
 
         {/* Schedule + Budget */}
