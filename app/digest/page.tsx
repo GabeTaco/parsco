@@ -4,6 +4,7 @@ import { eq, and, gte, lte } from 'drizzle-orm'
 import Nav from '@/components/Nav'
 import Anthropic from '@anthropic-ai/sdk'
 import { buildWeeklyDigestPrompt } from '@/lib/prompts/weekly-digest'
+import { requireAuth } from '@/lib/require-auth'
 
 export const revalidate = 300 // 5 minutes
 
@@ -31,6 +32,7 @@ function formatDate(dateStr: string) {
 }
 
 export default async function DigestPage() {
+  await requireAuth()
   const { mon, sun } = getWeekBounds()
   const now = new Date()
   const in14Days = new Date(now)
