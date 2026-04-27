@@ -33,33 +33,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#fbf8f2',
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: '#ffffff',
-          border: '1px solid #d8cfc2',
-          borderRadius: '8px',
-          padding: '48px 40px',
-          width: '100%',
-          maxWidth: '360px',
-          textAlign: 'center',
-        }}
-      >
-        <h1
-          className="serif"
-          style={{ fontSize: '2rem', fontWeight: 'normal', marginBottom: '8px', color: '#1a1512' }}
-        >
+    <div className="login-shell">
+      <div className="login-card">
+        <h1 className="serif" style={{ fontSize: '2rem', fontWeight: 'normal', marginBottom: '8px' }}>
           Parsco
         </h1>
-        <p style={{ color: '#8a7e74', marginBottom: '32px', fontSize: '0.9rem' }}>
+        <p className="muted" style={{ marginBottom: '32px', fontSize: '0.9rem' }}>
           Enter PIN to continue
         </p>
         <form onSubmit={handleSubmit}>
@@ -76,10 +55,10 @@ export default function LoginPage() {
               fontSize: '1.5rem',
               textAlign: 'center',
               letterSpacing: '0.5em',
-              border: '1px solid #d8cfc2',
+              border: '1px solid var(--border)',
               borderRadius: '6px',
-              backgroundColor: '#fbf8f2',
-              color: '#1a1512',
+              backgroundColor: 'var(--bg)',
+              color: 'var(--text)',
               outline: 'none',
               boxSizing: 'border-box',
             }}
@@ -87,7 +66,7 @@ export default function LoginPage() {
             autoComplete="off"
           />
           {error && (
-            <p style={{ color: '#6b1f1a', fontSize: '0.85rem', marginTop: '12px' }}>{error}</p>
+            <p style={{ color: 'var(--accent)', fontSize: '0.85rem', marginTop: '12px' }}>{error}</p>
           )}
           <button
             type="submit"
@@ -96,7 +75,7 @@ export default function LoginPage() {
               marginTop: '20px',
               width: '100%',
               padding: '12px',
-              backgroundColor: pin.length === 4 && !loading ? '#6b1f1a' : '#d8cfc2',
+              backgroundColor: pin.length === 4 && !loading ? 'var(--accent)' : 'var(--border)',
               color: '#ffffff',
               border: 'none',
               borderRadius: '6px',

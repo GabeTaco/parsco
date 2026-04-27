@@ -15,33 +15,15 @@ export default async function SiteReportPage({ params }: { params: Promise<{ tok
 
   if (tokenRows.length === 0) {
     return (
-      <main
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#fbf8f2',
-          padding: '24px',
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #d8cfc2',
-            borderRadius: '8px',
-            padding: '40px 32px',
-            maxWidth: '400px',
-            textAlign: 'center',
-          }}
-        >
+      <main className="login-shell" style={{ padding: '24px' }}>
+        <div className="card" style={{ maxWidth: '400px', textAlign: 'center', padding: '40px 32px', borderRadius: '8px' }}>
           <h1
             className="serif"
-            style={{ fontSize: '1.2rem', fontWeight: 'normal', color: '#1a1512', marginBottom: '12px' }}
+            style={{ fontSize: '1.2rem', fontWeight: 'normal', marginBottom: '12px' }}
           >
             Link Expired
           </h1>
-          <p style={{ color: '#8a7e74', fontSize: '0.9rem' }}>
+          <p className="muted" style={{ fontSize: '0.9rem' }}>
             This report link is no longer valid. Contact your project manager for a new link.
           </p>
         </div>
@@ -57,26 +39,21 @@ export default async function SiteReportPage({ params }: { params: Promise<{ tok
     <main
       style={{
         minHeight: '100vh',
-        backgroundColor: '#fbf8f2',
+        backgroundColor: 'var(--bg)',
         padding: '32px 16px',
       }}
     >
-      <div
-        style={{
-          maxWidth: '520px',
-          margin: '0 auto',
-        }}
-      >
+      <div style={{ maxWidth: '520px', margin: '0 auto' }}>
         <div style={{ marginBottom: '28px' }}>
           <p
-            className="serif"
-            style={{ fontSize: '1rem', color: '#8a7e74', marginBottom: '4px', fontStyle: 'italic' }}
+            className="serif muted"
+            style={{ fontSize: '1rem', marginBottom: '4px', fontStyle: 'italic' }}
           >
             Parsco GC
           </p>
           <h1
             className="serif"
-            style={{ fontSize: '1.4rem', fontWeight: 'normal', color: '#1a1512', margin: 0 }}
+            style={{ fontSize: '1.4rem', fontWeight: 'normal', margin: 0 }}
           >
             {job?.name ?? 'Site Report'}
           </h1>

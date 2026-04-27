@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "classifications": {
+    "locked": [
+      "CANONICAL.json",
+      "manifest.json",
+      "MERGE-PROTOCOL.md"
+    ],
+    "dynamic": [
+      "INDEX.md",
+      "company/profile.md"
+    ],
+    "static-research": [
+      "benchmarks/industry-margins.md",
+      "benchmarks/inspection-rates.md"
+    ]
+  },
+  "rules": {
+    "locked": "Do not modify without CEO approval. These are the source of truth.",
+    "dynamic": "Update as execution proceeds. These are living documents.",
+    "static-research": "Point-in-time snapshot. Update only with new research."
+  }
+}

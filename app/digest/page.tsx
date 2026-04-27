@@ -3,6 +3,7 @@ import { jobs, siteReports, issues, pendingDecisions } from '@/lib/db/schema'
 import { eq, and, gte, lte } from 'drizzle-orm'
 import Nav from '@/components/Nav'
 import Anthropic from '@anthropic-ai/sdk'
+import { buildWeeklyDigestPrompt } from '@/lib/prompts/weekly-digest'
 
 export const revalidate = 300 // 5 minutes
 
@@ -99,26 +100,25 @@ export default async function DigestPage() {
         return { job: j.name, reports: jReports.map((r) => r.digestText || r.workCompleted) }
       })
 
+      const prompt = buildWeeklyDigestPrompt({
+        activeJobs: activeJobs.map((j) => ({
+          name: j.name,
+          status: j.status,
+          percentComplete: j.percentComplete,
+          daysVariance: j.daysVariance,
+        })),
+        reportsGrouped,
+        weeklyIssues: weeklyIssues.map((i) => ({
+          title: i.title,
+          flagColor: i.flagColor,
+          description: i.description,
+        })),
+      })
+
       const message = await client.messages.create({
         model: 'claude-sonnet-4-6',
         max_tokens: 600,
-        messages: [
-          {
-            role: 'user',
-            content: `You are writing a weekly executive briefing for the CEO of a general contracting firm. He reads this on Sunday night. Be direct, no fluff.
-
-Active jobs and their state:
-${JSON.stringify(activeJobs.map((j) => ({ name: j.name, status: j.status, percentComplete: j.percentComplete, daysVariance: j.daysVariance })), null, 2)}
-
-Site reports from this week:
-${JSON.stringify(reportsGrouped, null, 2)}
-
-New or updated issues this week:
-${JSON.stringify(weeklyIssues.map((i) => ({ title: i.title, flagColor: i.flagColor, description: i.description })), null, 2)}
-
-Write a "What changed this week" section. Group by job. One bulleted line per change. No preamble. Bold any flag-worthy items.`,
-          },
-        ],
+        messages: [{ role: 'user', content: prompt }],
       })
       const block = message.content[0]
       if (block.type === 'text') aiDigest = block.text
@@ -138,97 +138,59 @@ Write a "What changed this week" section. Group by job. One bulleted line per ch
   return (
     <>
       <Nav />
-      <main style={{ padding: '48px 24px', maxWidth: '680px', margin: '0 auto' }}>
-        <p style={{ color: '#8a7e74', fontSize: '0.82rem', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+      <main className="page-shell--digest">
+        <p className="section-label" style={{ marginBottom: '8px' }}>
           Executive Briefing
         </p>
         <h1
           className="serif"
-          style={{ fontSize: '1.8rem', fontWeight: 'normal', marginBottom: '32px', color: '#1a1512' }}
+          style={{ fontSize: '1.8rem', fontWeight: 'normal', marginBottom: '32px' }}
         >
           {formatWeek(mon, sun)}
         </h1>
 
         {/* Stat blocks */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '12px',
-            marginBottom: '40px',
-          }}
-        >
+        <div className="stat-grid" style={{ marginBottom: '40px' }}>
           {[
             { label: 'Active Jobs', value: activeJobs.length },
             { label: 'Red Issues', value: openRedIssues.length },
             { label: 'Pending Decisions', value: pendingDecs.length },
           ].map((stat) => (
-            <div
-              key={stat.label}
-              style={{
-                backgroundColor: '#ffffff',
-                border: '1px solid #d8cfc2',
-                borderRadius: '8px',
-                padding: '20px',
-                textAlign: 'center',
-              }}
-            >
-              <div
-                className="serif"
-                style={{ fontSize: '2rem', fontWeight: 'normal', color: '#1a1512', lineHeight: 1 }}
-              >
-                {stat.value}
-              </div>
-              <div style={{ fontSize: '0.78rem', color: '#8a7e74', marginTop: '6px' }}>
-                {stat.label}
-              </div>
+            <div key={stat.label} className="stat-block">
+              <div className="serif stat-number">{stat.value}</div>
+              <div className="stat-label">{stat.label}</div>
             </div>
           ))}
         </div>
 
         {/* What changed this week */}
-        <section style={{ marginBottom: '40px' }}>
+        <section className="section" style={{ marginBottom: '40px' }}>
           <h2
             className="serif"
-            style={{ fontSize: '1.1rem', fontWeight: 'normal', color: '#1a1512', marginBottom: '16px' }}
+            style={{ fontSize: '1.1rem', fontWeight: 'normal', marginBottom: '16px' }}
           >
             What changed this week
           </h2>
           {aiDigest ? (
             <div
-              style={{
-                backgroundColor: '#ffffff',
-                border: '1px solid #d8cfc2',
-                borderRadius: '8px',
-                padding: '24px',
-                fontSize: '0.9rem',
-                lineHeight: '1.7',
-                color: '#1a1512',
-                whiteSpace: 'pre-wrap',
-              }}
+              className="card"
+              style={{ padding: '24px', fontSize: '0.9rem', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}
             >
               {aiDigest}
             </div>
           ) : weeklyReports.length > 0 ? (
-            <div
-              style={{
-                backgroundColor: '#ffffff',
-                border: '1px solid #d8cfc2',
-                borderRadius: '8px',
-                padding: '24px',
-              }}
-            >
+            <div className="card" style={{ padding: '24px' }}>
               {activeJobs.map((job) => {
                 const jReports = weeklyReports.filter((r) => r.jobId === job.id)
                 if (jReports.length === 0) return null
                 return (
                   <div key={job.id} style={{ marginBottom: '16px' }}>
-                    <div style={{ fontWeight: '600', fontSize: '0.9rem', marginBottom: '6px', color: '#1a1512' }}>
+                    <div style={{ fontWeight: '600', fontSize: '0.9rem', marginBottom: '6px' }}>
                       {job.name}
                     </div>
                     <ul style={{ margin: 0, paddingLeft: '18px' }}>
                       {jReports.map((r) => (
-                        <li key={r.id} style={{ fontSize: '0.87rem', color: '#1a1512', lineHeight: '1.6', marginBottom: '4px' }}>
+                        <li key={r.id} style={{ fontSize: '0.87rem', lineHeight: '1.6', marginBottom: '4px' }}>
                           {r.digestText || r.workCompleted}
                         </li>
                       ))}
@@ -238,16 +200,7 @@ Write a "What changed this week" section. Group by job. One bulleted line per ch
               })}
             </div>
           ) : (
-            <div
-              style={{
-                backgroundColor: '#ffffff',
-                border: '1px solid #d8cfc2',
-                borderRadius: '8px',
-                padding: '24px',
-                color: '#8a7e74',
-                fontSize: '0.9rem',
-              }}
-            >
+            <div className="card muted" style={{ padding: '24px', fontSize: '0.9rem' }}>
               {apiKey === 'placeholder_replace_me'
                 ? 'AI briefing unavailable — add a valid ANTHROPIC_API_KEY to enable. Showing raw report data below.'
                 : 'No site reports submitted this week.'}
@@ -260,7 +213,7 @@ Write a "What changed this week" section. Group by job. One bulleted line per ch
           <section style={{ marginBottom: '40px' }}>
             <h2
               className="serif"
-              style={{ fontSize: '1.1rem', fontWeight: 'normal', color: '#1a1512', marginBottom: '16px' }}
+              style={{ fontSize: '1.1rem', fontWeight: 'normal', marginBottom: '16px' }}
             >
               Flagged for attention
             </h2>
@@ -268,33 +221,26 @@ Write a "What changed this week" section. Group by job. One bulleted line per ch
               {openRedIssues.map((issue) => (
                 <div
                   key={issue.id}
+                  className="card--flush"
                   style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #f5d0d0',
-                    borderRadius: '8px',
+                    borderColor: '#f5d0d0',
                     padding: '16px 20px',
                     display: 'flex',
                     gap: '12px',
                   }}
                 >
                   <div
-                    style={{
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      backgroundColor: '#c0392b',
-                      marginTop: '4px',
-                      flexShrink: 0,
-                    }}
+                    className="flag-dot flag-dot--red"
+                    style={{ marginTop: '4px' }}
                   />
                   <div>
-                    <div style={{ fontWeight: '500', fontSize: '0.9rem', color: '#1a1512' }}>
+                    <div style={{ fontWeight: '500', fontSize: '0.9rem' }}>
                       {issue.title}
                     </div>
-                    <div style={{ fontSize: '0.82rem', color: '#8a7e74', marginTop: '4px' }}>
+                    <div className="muted" style={{ fontSize: '0.82rem', marginTop: '4px' }}>
                       {jobMap[issue.jobId] ?? 'Unknown job'}
                     </div>
-                    <div style={{ fontSize: '0.85rem', color: '#1a1512', marginTop: '6px', lineHeight: '1.5' }}>
+                    <div style={{ fontSize: '0.85rem', marginTop: '6px', lineHeight: '1.5' }}>
                       {issue.description}
                     </div>
                   </div>
@@ -309,25 +255,17 @@ Write a "What changed this week" section. Group by job. One bulleted line per ch
           <section style={{ marginBottom: '40px' }}>
             <h2
               className="serif"
-              style={{ fontSize: '1.1rem', fontWeight: 'normal', color: '#1a1512', marginBottom: '16px' }}
+              style={{ fontSize: '1.1rem', fontWeight: 'normal', marginBottom: '16px' }}
             >
               Pending decisions
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {pendingDecs.map((dec) => (
-                <div
-                  key={dec.id}
-                  style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #d8cfc2',
-                    borderRadius: '8px',
-                    padding: '16px 20px',
-                  }}
-                >
-                  <div style={{ fontWeight: '500', fontSize: '0.9rem', color: '#1a1512', marginBottom: '6px' }}>
+                <div key={dec.id} className="card" style={{ padding: '16px 20px' }}>
+                  <div style={{ fontWeight: '500', fontSize: '0.9rem', marginBottom: '6px' }}>
                     {dec.title}
                   </div>
-                  <div style={{ fontSize: '0.85rem', color: '#8a7e74', lineHeight: '1.5' }}>
+                  <div className="body-xs" style={{ color: 'var(--muted)' }}>
                     {dec.context}
                   </div>
                 </div>
@@ -341,7 +279,7 @@ Write a "What changed this week" section. Group by job. One bulleted line per ch
           <section style={{ marginBottom: '40px' }}>
             <h2
               className="serif"
-              style={{ fontSize: '1.1rem', fontWeight: 'normal', color: '#1a1512', marginBottom: '16px' }}
+              style={{ fontSize: '1.1rem', fontWeight: 'normal', marginBottom: '16px' }}
             >
               Looking ahead
             </h2>
@@ -349,18 +287,11 @@ Write a "What changed this week" section. Group by job. One bulleted line per ch
               {upcomingJobs.map((j) => (
                 <div
                   key={j.id}
-                  style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #d8cfc2',
-                    borderRadius: '8px',
-                    padding: '14px 20px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
+                  className="card--sm"
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                 >
-                  <span style={{ fontSize: '0.9rem', color: '#1a1512' }}>{j.name}</span>
-                  <span style={{ fontSize: '0.82rem', color: '#8a7e74' }}>
+                  <span style={{ fontSize: '0.9rem' }}>{j.name}</span>
+                  <span className="body-xs">
                     Target: {formatDate(j.targetCompletionDate)}
                   </span>
                 </div>
@@ -369,7 +300,7 @@ Write a "What changed this week" section. Group by job. One bulleted line per ch
           </section>
         )}
 
-        <p style={{ fontSize: '0.75rem', color: '#8a7e74', borderTop: '1px solid #d8cfc2', paddingTop: '16px' }}>
+        <p className="muted" style={{ fontSize: '0.75rem', borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
           Generated {generatedAt}
         </p>
       </main>

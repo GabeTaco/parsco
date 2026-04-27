@@ -3,6 +3,7 @@ import { db } from '@/lib/db'
 import { tokens, siteReports, jobs } from '@/lib/db/schema'
 import { eq, and, gt } from 'drizzle-orm'
 import Anthropic from '@anthropic-ai/sdk'
+import { buildSiteReportPrompt } from '@/lib/prompts/site-report'
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,27 +54,19 @@ export async function POST(req: NextRequest) {
     if (apiKey && apiKey !== 'placeholder_replace_me') {
       try {
         const client = new Anthropic({ apiKey })
+        const prompt = buildSiteReportPrompt({
+          jobName: job.name,
+          clientName: job.clientName,
+          status: job.status,
+          superName,
+          reportDate,
+          workCompleted,
+          blockers: blockers || null,
+        })
         const message = await client.messages.create({
           model: 'claude-sonnet-4-6',
           max_tokens: 300,
-          messages: [
-            {
-              role: 'user',
-              content: `You are summarizing a daily site report from a superintendent for the CEO of a general contracting firm. The CEO reads only the digest, not the raw report. Be concise — 2-3 sentences max. Highlight what got done, flag any blockers as concerns, and suggest a follow-up only if genuinely warranted.
-
-Job: ${job.name}
-Client: ${job.clientName}
-Status: ${job.status}
-Super: ${superName}
-Date: ${reportDate}
-
-What got done today:
-${workCompleted}
-
-Blockers:
-${blockers || 'None reported'}`,
-            },
-          ],
+          messages: [{ role: 'user', content: prompt }],
         })
         const block = message.content[0]
         if (block.type === 'text') {

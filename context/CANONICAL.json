@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "version": "1.0",
+    "last_updated": "2026-04-27",
+    "description": "GC business benchmarks and KPI targets. AI prompts pull from this. Changes require CEO approval."
+  },
+  "company": {
+    "name": "Parsco General Contracting",
+    "type": "general_contractor",
+    "primary_market": "residential_and_commercial",
+    "leadership": {
+      "ceo": "Amir",
+      "field_leadership": "Foremen"
+    }
+  },
+  "job_health": {
+    "schedule_flags": {
+      "yellow_days_behind": 3,
+      "red_days_behind": 7
+    },
+    "budget_flags": {
+      "yellow_overage_pct": 5,
+      "red_overage_pct": 10
+    },
+    "completion_flags": {
+      "approaching_deadline_days": 14
+    }
+  },
+  "industry_benchmarks": {
+    "gross_margin_pct": {
+      "residential_remodel": { "low": 20, "mid": 28, "high": 35 },
+      "commercial_buildout": { "low": 15, "mid": 22, "high": 30 },
+      "new_construction": { "low": 18, "mid": 25, "high": 32 }
+    },
+    "overhead_pct": { "small_gc": 10, "mid_gc": 15, "large_gc": 20 },
+    "labor_as_pct_of_contract": { "residential": 30, "commercial": 35 },
+    "materials_as_pct_of_contract": { "residential": 40, "commercial": 45 },
+    "change_order_frequency": "15-25% of projects receive at least one CO",
+    "inspection_fail_rate": "12% of rough-in inspections require rework on first attempt"
+  },
+  "kpi_targets": {
+    "schedule_variance_target": 0,
+    "budget_variance_target_pct": 3,
+    "site_report_frequency": "daily",
+    "issue_resolution_days": {
+      "red": 3,
+      "yellow": 7,
+      "green": 14
+    },
+    "percent_complete_accuracy": "within 5% of actual"
+  },
+  "digest": {
+    "weekly_briefing_day": "Sunday",
+    "weekly_briefing_time": "evening",
+    "report_lookback_days": 7,
+    "upcoming_deadline_window_days": 14
+  },
+  "issue_severity": {
+    "red": "Blocks progress or has financial/legal/safety risk. Requires immediate CEO attention.",
+    "yellow": "Causes delay or cost risk but has a mitigation path. Monitor closely.",
+    "green": "Informational positive. Milestone reached, approval received, risk resolved."
+  },
+  "change_order_guidance": {
+    "review_threshold_dollars": 5000,
+    "approval_required_above_dollars": 10000,
+    "typical_co_markup_pct": 15
+  }
+}

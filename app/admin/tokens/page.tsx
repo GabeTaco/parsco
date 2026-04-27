@@ -32,67 +32,40 @@ export default async function AdminTokensPage() {
   return (
     <>
       <Nav />
-      <main style={{ padding: '32px 24px', maxWidth: '780px', margin: '0 auto' }}>
-        <h1
-          className="serif"
-          style={{ fontSize: '1.6rem', fontWeight: 'normal', marginBottom: '8px', color: '#1a1512' }}
-        >
+      <main className="page-shell--narrow">
+        <h1 className="serif page-title" style={{ marginBottom: '8px' }}>
           Report Tokens
         </h1>
-        <p style={{ color: '#8a7e74', fontSize: '0.85rem', marginBottom: '32px' }}>
+        <p className="muted" style={{ fontSize: '0.85rem', marginBottom: '32px' }}>
           Generate shareable links for supers to submit daily site reports.
         </p>
 
         <TokenForm jobs={allJobs.map((j) => ({ id: j.id, name: j.name }))} />
 
         <div style={{ marginTop: '40px' }}>
-          <h2
-            style={{
-              fontSize: '0.75rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: '#8a7e74',
-              margin: '0 0 16px',
-            }}
-          >
+          <h2 className="section-label" style={{ margin: '0 0 16px' }}>
             Active Tokens
           </h2>
           {tokenRows.length === 0 ? (
-            <p style={{ color: '#8a7e74', fontSize: '0.85rem' }}>No tokens yet.</p>
+            <p className="muted" style={{ fontSize: '0.85rem' }}>No tokens yet.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {tokenRows.map((t) => (
-                <div
-                  key={t.id}
-                  style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #d8cfc2',
-                    borderRadius: '8px',
-                    padding: '16px 20px',
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                      flexWrap: 'wrap',
-                      gap: '8px',
-                    }}
-                  >
+                <div key={t.id} className="card" style={{ padding: '16px 20px' }}>
+                  <div className="row--top">
                     <div>
-                      <div style={{ fontWeight: '500', fontSize: '0.9rem', color: '#1a1512', marginBottom: '4px' }}>
+                      <div style={{ fontWeight: '500', fontSize: '0.9rem', marginBottom: '4px' }}>
                         {t.jobName ?? 'Unknown job'}
                       </div>
                       <div
                         style={{
                           fontSize: '0.78rem',
-                          color: '#8a7e74',
+                          color: 'var(--muted)',
                           fontFamily: 'monospace',
-                          backgroundColor: '#fbf8f2',
+                          backgroundColor: 'var(--bg)',
                           padding: '4px 8px',
                           borderRadius: '4px',
-                          border: '1px solid #d8cfc2',
+                          border: '1px solid var(--border)',
                           marginBottom: '8px',
                         }}
                       >
@@ -100,7 +73,7 @@ export default async function AdminTokensPage() {
                       </div>
                       <CopyUrl tokenValue={t.tokenValue} />
                     </div>
-                    <div style={{ textAlign: 'right', fontSize: '0.8rem', color: '#8a7e74' }}>
+                    <div className="muted" style={{ textAlign: 'right', fontSize: '0.8rem' }}>
                       <div>Expires {formatDate(t.expiresAt)}</div>
                     </div>
                   </div>
@@ -118,7 +91,7 @@ function CopyUrl({ tokenValue }: { tokenValue: string }) {
   const url = `/form/site-report/${tokenValue}`
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <span style={{ fontSize: '0.78rem', color: '#8a7e74' }}>{url}</span>
+      <span className="muted" style={{ fontSize: '0.78rem' }}>{url}</span>
     </div>
   )
 }
