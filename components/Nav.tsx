@@ -24,7 +24,7 @@ export default function Nav() {
             </Link>
           </li>
           <li>
-            <Link href="/admin/tokens" className={pathname.startsWith('/admin') ? 'active' : ''}>
+            <Link href="/admin" className={pathname.startsWith('/admin') ? 'active' : ''}>
               Admin
             </Link>
           </li>
