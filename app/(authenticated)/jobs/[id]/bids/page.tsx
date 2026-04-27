@@ -4,7 +4,7 @@ import { eq, desc } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Nav from '@/components/Nav'
-import BidCard from '../../admin/BidCard'
+import BidCard from '@/app/(authenticated)/admin/BidCard'
 
 function formatCurrency(v: string) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(parseFloat(v))
