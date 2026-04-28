@@ -76,7 +76,12 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
           </div>
           <div className="meta" style={{ marginTop: '4px' }}>{job.clientName}</div>
           <div className="meta" style={{ marginTop: '2px' }}>{job.siteAddress}</div>
-          <div style={{ marginTop: '12px' }}>
+          <div style={{ marginTop: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <Link href={`/jobs/${id}/estimate`} className="btn" style={{ fontSize: '0.75rem', padding: '5px 12px' }}>Estimate</Link>
+            <Link href={`/jobs/${id}/schedule`} className="btn" style={{ fontSize: '0.75rem', padding: '5px 12px' }}>Schedule</Link>
+            <Link href={`/jobs/${id}/billings`} className="btn" style={{ fontSize: '0.75rem', padding: '5px 12px' }}>Billings</Link>
+            <Link href={`/jobs/${id}/rfis`} className="btn" style={{ fontSize: '0.75rem', padding: '5px 12px' }}>RFIs</Link>
+            <Link href={`/jobs/${id}/submittals`} className="btn" style={{ fontSize: '0.75rem', padding: '5px 12px' }}>Submittals</Link>
             <Link href={`/jobs/${id}/bids`} className="btn" style={{ fontSize: '0.75rem', padding: '5px 12px' }}>
               Bids {bidCount.length > 0 ? `(${bidCount.length})` : ''}
             </Link>

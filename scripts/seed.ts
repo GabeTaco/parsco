@@ -12,10 +12,18 @@ async function main() {
   console.log('Seeding database...')
 
   // Clear existing data in dependency order
+  await db.delete(schema.estimateItems)
+  await db.delete(schema.estimates)
+  await db.delete(schema.rfis)
+  await db.delete(schema.submittals)
+  await db.delete(schema.scheduleActivities)
+  await db.delete(schema.invoices)
   await db.delete(schema.pendingDecisions)
   await db.delete(schema.tokens)
   await db.delete(schema.siteReports)
   await db.delete(schema.issues)
+  await db.delete(schema.bids)
+  await db.delete(schema.bidLineItems)
   await db.delete(schema.jobs)
 
   console.log('Cleared existing data.')
@@ -60,7 +68,90 @@ async function main() {
     daysVariance: 2,
   }).returning()
 
-  console.log('Jobs inserted:', job1.id, job2.id, job3.id)
+  const [job4] = await db.insert(schema.jobs).values({
+    name: 'New Construction — Simpson Residence',
+    clientName: 'Mr. & Mrs. Stephen Simpson',
+    siteAddress: '11655 Chanticleer Dr, Pensacola FL',
+    contractValue: '1970978',
+    currentSpend: '0',
+    status: 'bidding',
+    startDate: '2026-06-01',
+    targetCompletionDate: '2027-06-01',
+    percentComplete: 0,
+    daysVariance: 0,
+  }).returning()
+
+  console.log('Jobs inserted:', job1.id, job2.id, job3.id, job4.id)
+
+  // Simpson Residence Preliminary Estimate
+  const [simpsonEstimate] = await db.insert(schema.estimates).values({
+    jobId: job4.id,
+    name: 'Preliminary Estimate — 1.5.26',
+  }).returning()
+
+  await db.insert(schema.estimateItems).values([
+    // Division 1 — General Requirements
+    { estimateId: simpsonEstimate.id, csiDivision: 1, itemNumber: '01-001', description: 'Project Manager', qty: '52', unit: 'Wks', laborUnit: '2000', laborTotal: '104000', materialUnit: '0', materialTotal: '0', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '104000', bic: 'PM', sortOrder: 0 },
+    { estimateId: simpsonEstimate.id, csiDivision: 1, itemNumber: '01-002', description: 'Superintendent', qty: '52', unit: 'Wks', laborUnit: '1500', laborTotal: '78000', materialUnit: '0', materialTotal: '0', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '78000', bic: 'PM', sortOrder: 1 },
+    { estimateId: simpsonEstimate.id, csiDivision: 1, itemNumber: '01-003', description: 'Fuel & Travel', qty: '52', unit: 'Wks', laborUnit: '0', laborTotal: '0', materialUnit: '100', materialTotal: '5200', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '5200', bic: 'Super', sortOrder: 2 },
+    { estimateId: simpsonEstimate.id, csiDivision: 1, itemNumber: '01-004', description: 'Building Layout', qty: '6001.6', unit: 'SF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '0.45', subTotal: '2701', equipUnit: '0', equipTotal: '0', lineTotal: '2701', bic: 'Super', sortOrder: 3 },
+    { estimateId: simpsonEstimate.id, csiDivision: 1, itemNumber: '01-005', description: 'Small Tools & Supplies', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '1000', materialTotal: '1000', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '1000', bic: 'Super', sortOrder: 4 },
+    { estimateId: simpsonEstimate.id, csiDivision: 1, itemNumber: '01-006', description: 'Dumpsters', qty: '10', unit: 'EA', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '0', subTotal: '0', equipUnit: '2000', equipTotal: '20000', lineTotal: '20000', bic: 'Super', sortOrder: 5 },
+    { estimateId: simpsonEstimate.id, csiDivision: 1, itemNumber: '01-007', description: 'Portable Toilets', qty: '12', unit: 'Mos', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '0', subTotal: '0', equipUnit: '135', equipTotal: '1620', lineTotal: '1620', bic: 'Super', sortOrder: 6 },
+    { estimateId: simpsonEstimate.id, csiDivision: 1, itemNumber: '01-008', description: 'Weekly Cleanup', qty: '52', unit: 'Wks', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '80', subTotal: '4160', equipUnit: '0', equipTotal: '0', lineTotal: '4160', bic: 'Super', sortOrder: 7 },
+    { estimateId: simpsonEstimate.id, csiDivision: 1, itemNumber: '01-009', description: 'Final Clean Up', qty: '6001.6', unit: 'SF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '0.65', subTotal: '3901', equipUnit: '0', equipTotal: '0', lineTotal: '3901', bic: 'Super', sortOrder: 8 },
+    { estimateId: simpsonEstimate.id, csiDivision: 1, itemNumber: '01-010', description: 'Permit', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '2500', materialTotal: '2500', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '2500', bic: 'PM', sortOrder: 9 },
+    // Division 2 — Site Construction
+    { estimateId: simpsonEstimate.id, csiDivision: 2, itemNumber: '02-001', description: 'Fine Grade Building Pad', qty: '3667.23', unit: 'SF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '1.88', subTotal: '6894', equipUnit: '0', equipTotal: '0', lineTotal: '6894', bic: 'Wyatt', sortOrder: 0 },
+    { estimateId: simpsonEstimate.id, csiDivision: 2, itemNumber: '02-002', description: "Pilings 14\"×14\" (Davis Marine)", qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '103500', subTotal: '103500', equipUnit: '0', equipTotal: '0', lineTotal: '103500', bic: 'Davis Marine', sortOrder: 1 },
+    { estimateId: simpsonEstimate.id, csiDivision: 2, itemNumber: '02-003', description: 'Landscaping / Irrigation', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '0', bic: 'Wyatt', sortOrder: 2 },
+    // Division 3 — Concrete
+    { estimateId: simpsonEstimate.id, csiDivision: 3, itemNumber: '03-001', description: 'ICF Main Level & Floor above (ICF Strong)', qty: '1', unit: 'Budget', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '143250', subTotal: '143250', equipUnit: '0', equipTotal: '0', lineTotal: '143250', bic: 'ICF Strong', sortOrder: 0 },
+    { estimateId: simpsonEstimate.id, csiDivision: 3, itemNumber: '03-002', description: 'ICF Deck & Supporting Beams (ICF Strong)', qty: '1', unit: 'Budget', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '187862', subTotal: '187862', equipUnit: '0', equipTotal: '0', lineTotal: '187862', bic: 'ICF Strong', sortOrder: 1 },
+    { estimateId: simpsonEstimate.id, csiDivision: 3, itemNumber: '03-003', description: "Slab 4\" thick", qty: '26.1', unit: 'CY', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '625', subTotal: '16313', equipUnit: '0', equipTotal: '0', lineTotal: '16313', bic: 'Levi', sortOrder: 2 },
+    { estimateId: simpsonEstimate.id, csiDivision: 3, itemNumber: '03-004', description: 'Site Concrete — Driveway 4"', qty: '20', unit: 'CY', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '625', subTotal: '12500', equipUnit: '0', equipTotal: '0', lineTotal: '12500', bic: 'Levi', sortOrder: 3 },
+    // Division 5 — Metals
+    { estimateId: simpsonEstimate.id, csiDivision: 5, itemNumber: '05-001', description: 'Cable Railings', qty: '142.9', unit: 'LF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '150', subTotal: '21435', equipUnit: '0', equipTotal: '0', lineTotal: '21435', bic: 'Fluid', sortOrder: 0 },
+    // Division 6 — Wood & Plastics
+    { estimateId: simpsonEstimate.id, csiDivision: 6, itemNumber: '06-001', description: 'Framing Labor (Salvador)', qty: '6001.6', unit: 'SF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '5', subTotal: '30008', equipUnit: '0', equipTotal: '0', lineTotal: '30008', bic: 'Salvador', sortOrder: 0 },
+    { estimateId: simpsonEstimate.id, csiDivision: 6, itemNumber: '06-002', description: 'Wall Framing Material (Mobile Lumber)', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '3250', subTotal: '3250', equipUnit: '0', equipTotal: '0', lineTotal: '3250', bic: 'Wyatt', sortOrder: 1 },
+    { estimateId: simpsonEstimate.id, csiDivision: 6, itemNumber: '06-003', description: 'Roof & Floor Trusses (Swift)', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '16035', subTotal: '16035', equipUnit: '0', equipTotal: '0', lineTotal: '16035', bic: 'Swift', sortOrder: 2 },
+    { estimateId: simpsonEstimate.id, csiDivision: 6, itemNumber: '06-004', description: 'Wood Base', qty: '1135.8', unit: 'LF', laborUnit: '2.5', laborTotal: '2839', materialUnit: '1.25', materialTotal: '1420', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '4259', bic: 'Super', sortOrder: 3 },
+    { estimateId: simpsonEstimate.id, csiDivision: 6, itemNumber: '06-005', description: 'Composite Decking — Balconies', qty: '746', unit: 'SF', laborUnit: '3.5', laborTotal: '2611', materialUnit: '9', materialTotal: '6714', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '9325', bic: 'Wyatt', sortOrder: 4 },
+    { estimateId: simpsonEstimate.id, csiDivision: 6, itemNumber: '06-006', description: 'Handrail For Stairs', qty: '100', unit: 'LF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '50', subTotal: '5000', equipUnit: '0', equipTotal: '0', lineTotal: '5000', bic: 'Super', sortOrder: 5 },
+    // Division 7 — Thermal & Moisture Protection
+    { estimateId: simpsonEstimate.id, csiDivision: 7, itemNumber: '07-001', description: 'Roofing (Guardian Roofing)', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '60850', subTotal: '60850', equipUnit: '0', equipTotal: '0', lineTotal: '60850', bic: 'Guardian', sortOrder: 0 },
+    { estimateId: simpsonEstimate.id, csiDivision: 7, itemNumber: '07-002', description: 'Spray Foam Insulation', qty: '3923.5', unit: 'SF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '2.5', subTotal: '9809', equipUnit: '0', equipTotal: '0', lineTotal: '9809', bic: 'SHS', sortOrder: 1 },
+    { estimateId: simpsonEstimate.id, csiDivision: 7, itemNumber: '07-003', description: 'Board & Batten and Soffit', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '12281', subTotal: '12281', equipUnit: '0', equipTotal: '0', lineTotal: '12281', bic: 'Wyatt', sortOrder: 2 },
+    { estimateId: simpsonEstimate.id, csiDivision: 7, itemNumber: '07-004', description: 'Soffit at Porches', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '12377', subTotal: '12377', equipUnit: '0', equipTotal: '0', lineTotal: '12377', bic: 'Wyatt', sortOrder: 3 },
+    // Division 8 — Doors & Windows
+    { estimateId: simpsonEstimate.id, csiDivision: 8, itemNumber: '08-001', description: 'Windows (Anderson)', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '58025', materialTotal: '58025', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '58025', bic: 'Vendors', sortOrder: 0 },
+    { estimateId: simpsonEstimate.id, csiDivision: 8, itemNumber: '08-002', description: 'Garage Doors', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '31054', subTotal: '31054', equipUnit: '0', equipTotal: '0', lineTotal: '31054', bic: 'Precision', sortOrder: 1 },
+    { estimateId: simpsonEstimate.id, csiDivision: 8, itemNumber: '08-003', description: 'Exterior Doors', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '0', bic: 'Vendors', sortOrder: 2 },
+    { estimateId: simpsonEstimate.id, csiDivision: 8, itemNumber: '08-004', description: 'Interior Doors', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '0', bic: 'Vendors', sortOrder: 3 },
+    // Division 9 — Finishes
+    { estimateId: simpsonEstimate.id, csiDivision: 9, itemNumber: '09-001', description: 'Sheetrock Hang & Finish — Walls', qty: '308', unit: 'Boards', laborUnit: '22.08', laborTotal: '6801', materialUnit: '79.2', materialTotal: '24394', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '31195', bic: 'Buddy Pittman', sortOrder: 0 },
+    { estimateId: simpsonEstimate.id, csiDivision: 9, itemNumber: '09-002', description: 'Sheetrock Hang & Finish — Ceilings', qty: '117.5', unit: 'Boards', laborUnit: '22.08', laborTotal: '2594', materialUnit: '79.2', materialTotal: '9306', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '11900', bic: 'Buddy Pittman', sortOrder: 1 },
+    { estimateId: simpsonEstimate.id, csiDivision: 9, itemNumber: '09-003', description: 'Paint — Sheetrock Walls', qty: '14795', unit: 'SF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '1.25', subTotal: '18494', equipUnit: '0', equipTotal: '0', lineTotal: '18494', bic: 'Peterson', sortOrder: 2 },
+    { estimateId: simpsonEstimate.id, csiDivision: 9, itemNumber: '09-004', description: 'Paint — Stucco & Hardie', qty: '5910', unit: 'SF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '5', subTotal: '29550', equipUnit: '0', equipTotal: '0', lineTotal: '29550', bic: 'Peterson', sortOrder: 3 },
+    { estimateId: simpsonEstimate.id, csiDivision: 9, itemNumber: '09-005', description: 'LVP — Owner Furnished, Contractor Installed', qty: '3385', unit: 'SF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '2.15', subTotal: '7278', equipUnit: '0', equipTotal: '0', lineTotal: '7278', bic: 'Super', sortOrder: 4 },
+    { estimateId: simpsonEstimate.id, csiDivision: 9, itemNumber: '09-006', description: 'Floor Tile', qty: '345', unit: 'SF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '15', subTotal: '5175', equipUnit: '0', equipTotal: '0', lineTotal: '5175', bic: 'Sub', sortOrder: 5 },
+    { estimateId: simpsonEstimate.id, csiDivision: 9, itemNumber: '09-007', description: 'Wall Tile — Bathrooms', qty: '843', unit: 'SF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '20', subTotal: '16860', equipUnit: '0', equipTotal: '0', lineTotal: '16860', bic: 'Sub', sortOrder: 6 },
+    // Division 10 — Specialties
+    { estimateId: simpsonEstimate.id, csiDivision: 10, itemNumber: '10-001', description: 'Fireplace — Allowance', qty: '1', unit: 'Allow', laborUnit: '0', laborTotal: '0', materialUnit: '5000', materialTotal: '5000', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '5000', bic: 'Simpsons', sortOrder: 0 },
+    { estimateId: simpsonEstimate.id, csiDivision: 10, itemNumber: '10-002', description: 'Bath Accessories', qty: '4', unit: 'EA', laborUnit: '320', laborTotal: '1280', materialUnit: '1500', materialTotal: '6000', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '7280', bic: 'Super', sortOrder: 1 },
+    // Division 13 — Special Construction
+    { estimateId: simpsonEstimate.id, csiDivision: 13, itemNumber: '13-001', description: 'Gunnite Swimming Pool (Cox Pools)', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '126715', subTotal: '126715', equipUnit: '0', equipTotal: '0', lineTotal: '126715', bic: 'Cox Pools', sortOrder: 0 },
+    // Division 14 — Conveying Systems
+    { estimateId: simpsonEstimate.id, csiDivision: 14, itemNumber: '14-001', description: 'Elevator — 3 Stop (Panhandle)', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '27500', subTotal: '27500', equipUnit: '0', equipTotal: '0', lineTotal: '27500', bic: 'Bradley Dortch', sortOrder: 0 },
+    // Division 15 — Mechanical
+    { estimateId: simpsonEstimate.id, csiDivision: 15, itemNumber: '15-001', description: 'HVAC — 15 Tons (NWFL)', qty: '15', unit: 'Tons', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '2500', subTotal: '37500', equipUnit: '0', equipTotal: '0', lineTotal: '37500', bic: 'NWFL', sortOrder: 0 },
+    { estimateId: simpsonEstimate.id, csiDivision: 15, itemNumber: '15-002', description: 'Plumbing', qty: '5000', unit: 'SF', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '7.5', subTotal: '37500', equipUnit: '0', equipTotal: '0', lineTotal: '37500', bic: 'Sub', sortOrder: 1 },
+    // Division 16 — Electrical
+    { estimateId: simpsonEstimate.id, csiDivision: 16, itemNumber: '16-001', description: 'Electrical (Johnson)', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '28150', subTotal: '28150', equipUnit: '0', equipTotal: '0', lineTotal: '28150', bic: 'Johnson', sortOrder: 0 },
+    { estimateId: simpsonEstimate.id, csiDivision: 16, itemNumber: '16-002', description: 'Generator (Johnson)', qty: '1', unit: 'LS', laborUnit: '0', laborTotal: '0', materialUnit: '0', materialTotal: '0', subUnit: '18804', subTotal: '18804', equipUnit: '0', equipTotal: '0', lineTotal: '18804', bic: 'Johnson', sortOrder: 1 },
+    { estimateId: simpsonEstimate.id, csiDivision: 16, itemNumber: '16-003', description: 'Low Voltage / Technology', qty: '6001', unit: 'SF', laborUnit: '0', laborTotal: '0', materialUnit: '5.5', materialTotal: '33006', subUnit: '0', subTotal: '0', equipUnit: '0', equipTotal: '0', lineTotal: '33006', bic: 'Total Connect', sortOrder: 2 },
+  ])
 
   // Insert issues
   await db.insert(schema.issues).values([

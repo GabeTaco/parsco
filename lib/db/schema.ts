@@ -93,6 +93,118 @@ export const pendingDecisions = pgTable('pending_decisions', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
+// ── Estimate Module ──────────────────────────────────────────────────────────
+
+export const estimates = pgTable('estimates', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  jobId: uuid('job_id').notNull().references(() => jobs.id),
+  name: text('name').notNull().default('Initial Estimate'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+export const estimateItems = pgTable('estimate_items', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  estimateId: uuid('estimate_id').notNull().references(() => estimates.id, { onDelete: 'cascade' }),
+  csiDivision: integer('csi_division').notNull(),
+  itemNumber: text('item_number'),
+  description: text('description').notNull(),
+  qty: numeric('qty').default('0'),
+  unit: text('unit'),
+  laborUnit: numeric('labor_unit').default('0'),
+  laborTotal: numeric('labor_total').default('0'),
+  materialUnit: numeric('material_unit').default('0'),
+  materialTotal: numeric('material_total').default('0'),
+  subUnit: numeric('sub_unit').default('0'),
+  subTotal: numeric('sub_total').default('0'),
+  equipUnit: numeric('equip_unit').default('0'),
+  equipTotal: numeric('equip_total').default('0'),
+  lineTotal: numeric('line_total').default('0'),
+  bic: text('bic'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
+// ── Project Modules ───────────────────────────────────────────────────────────
+
+export const rfiStatusEnum = pgEnum('rfi_status', ['open', 'answered', 'closed'])
+
+export const rfis = pgTable('rfis', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  jobId: uuid('job_id').notNull().references(() => jobs.id),
+  rfiNumber: integer('rfi_number').notNull(),
+  subject: text('subject').notNull(),
+  question: text('question').notNull(),
+  drawingRef: text('drawing_ref'),
+  sentTo: text('sent_to'),
+  submittedBy: text('submitted_by'),
+  status: rfiStatusEnum('status').notNull().default('open'),
+  answer: text('answer'),
+  answeredBy: text('answered_by'),
+  dueDate: date('due_date'),
+  submittedAt: timestamp('submitted_at').defaultNow().notNull(),
+  answeredAt: timestamp('answered_at'),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+export const submittalStatusEnum = pgEnum('submittal_status', ['pending', 'submitted', 'approved', 'approved_as_noted', 'revise_resubmit', 'rejected'])
+
+export const submittals = pgTable('submittals', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  jobId: uuid('job_id').notNull().references(() => jobs.id),
+  submittalNumber: text('submittal_number').notNull(),
+  specSection: text('spec_section'),
+  description: text('description').notNull(),
+  submittedBy: text('submitted_by'),
+  reviewedBy: text('reviewed_by'),
+  status: submittalStatusEnum('status').notNull().default('pending'),
+  revisionNo: integer('revision_no').default(0).notNull(),
+  reviewerNotes: text('reviewer_notes'),
+  dueDate: date('due_date'),
+  submittedAt: timestamp('submitted_at'),
+  reviewedAt: timestamp('reviewed_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+export const activityStatusEnum = pgEnum('activity_status', ['not_started', 'in_progress', 'complete', 'delayed'])
+
+export const scheduleActivities = pgTable('schedule_activities', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  jobId: uuid('job_id').notNull().references(() => jobs.id),
+  title: text('title').notNull(),
+  csiDivision: integer('csi_division'),
+  startDate: date('start_date'),
+  endDate: date('end_date'),
+  durationDays: integer('duration_days'),
+  predecessorId: uuid('predecessor_id').references((): AnyPgColumn => scheduleActivities.id),
+  percentComplete: integer('percent_complete').default(0).notNull(),
+  status: activityStatusEnum('status').notNull().default('not_started'),
+  notes: text('notes'),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+export const invoiceStatusEnum = pgEnum('invoice_status', ['pending', 'approved', 'paid', 'disputed'])
+
+export const invoices = pgTable('invoices', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  jobId: uuid('job_id').notNull().references(() => jobs.id),
+  invoiceNumber: text('invoice_number'),
+  vendor: text('vendor').notNull(),
+  description: text('description'),
+  csiDivision: integer('csi_division'),
+  amount: numeric('amount').notNull(),
+  invoiceDate: date('invoice_date').notNull(),
+  dueDate: date('due_date'),
+  paidDate: date('paid_date'),
+  status: invoiceStatusEnum('status').notNull().default('pending'),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
 // ── Command Center ──────────────────────────────────────────────────────────
 
 export const askStatusEnum = pgEnum('ask_status', ['pending', 'sent', 'opened', 'responded', 'expired', 'escalated'])
